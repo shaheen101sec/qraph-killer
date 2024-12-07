@@ -86,6 +86,11 @@ Example output:
 
 ---
 
+## Screenshot
+
+<img src="tool.png" alt="GraphQL Tool">
+
+---
 ## Supported GraphQL Paths
 
 you can add more paths in the code if you want,
