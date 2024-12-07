@@ -25,7 +25,7 @@ This tool can be useful for security researchers, developers, and penetration te
 1. Clone the repository:
    ```bash
    git clone https://github.com/shaheen101sec/qraph-killer.git
-   cd graphql-endpoint-detector
+   cd qraph-killer
    ```
 
 2. Install the required dependencies:
