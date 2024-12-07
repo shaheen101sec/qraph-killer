@@ -41,7 +41,7 @@ This tool can be useful for security researchers, developers, and penetration te
 
 ## Usage
 
-Run the script with the following command:
+Run the script with the following commands:
 ```bash
 python3 tool.py --url https://example.com -o <output_file>
 python3 tool.py -u https://example.com -o <output_file>
