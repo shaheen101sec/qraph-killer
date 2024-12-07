@@ -43,15 +43,15 @@ This tool can be useful for security researchers, developers, and penetration te
 
 Run the script with the following command:
 ```bash
-python3 tool.py -u http://example.com -o <output_file>
+python3 tool.py --url https://example.com -o <output_file>
 python3 tool.py -u https://example.com -o <output_file>
-python3 tool.py -u example.com -o <output_file>
 python3 tool.sh -l <input_file> -o <output_file>
 ```
 
 ### Parameters:
 - `-l` or `--list`: Path to the input file containing URLs (one URL per line).
 - `-o` or `--output`: Path to the output file where results will be saved.
+- `-u` or `--url` : Single URL to scan.
 
 ### Example:
 ```bash
