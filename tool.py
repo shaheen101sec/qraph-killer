@@ -17,42 +17,50 @@ GRAPHQL_PATHS = [
     "/graphql/v3", "/graphql-endpoint", "/graphql-admin", "/graph-query"
 ]
 
+def scan_url(url, output_file=None):
+    """Scan a single URL for GraphQL endpoints."""
+    if not url.startswith("http://") and not url.startswith("https://"):
+        url = f"https://{url.strip()}"
+
+    results = []
+    for path in GRAPHQL_PATHS:
+        graphql_url = f"{url.rstrip('/')}{path}"
+        try:
+            # Send a POST request to the GraphQL endpoint
+            response = requests.post(graphql_url, json={"query": "{ __schema { queryType { name } } }"}, timeout=5)
+
+            # Check the response
+            if response.status_code == 200:
+                result = f"[FOUND] GraphQL endpoint detected at: {graphql_url}"
+                print(f"{Fore.GREEN}{result}")
+                results.append(result)
+            elif response.status_code in [403, 405]:
+                result = f"[POSSIBLE] Possible GraphQL endpoint at: {graphql_url} (HTTP {response.status_code})"
+                print(f"{Fore.YELLOW}{result}")
+                results.append(result)
+            else:
+                result = f"[FAILED] No GraphQL endpoint at: {graphql_url} (HTTP {response.status_code})"
+                print(f"{Fore.RED}{result}")
+        except requests.exceptions.RequestException as e:
+            result = f"[ERROR] Could not connect to: {graphql_url} - {e}"
+            print(f"{Fore.RED}{result}")
+            results.append(result)
+
+    # Write results to output file if specified
+    if output_file:
+        with open(output_file, "w") as outfile:
+            for result in results:
+                outfile.write(result + "\n")
+
 def detect_graphql(input_file, output_file):
+    """Scan a list of URLs for GraphQL endpoints."""
     try:
         # Open the file containing URLs
         with open(input_file, 'r') as file:
             urls = file.read().splitlines()
 
-        # Prepare to write results to the output file
-        with open(output_file, 'w') as outfile:
-            print("Testing URLs for GraphQL endpoints...\n")
-            for url in urls:
-                if not url.startswith("http://") and not url.startswith("https://"):
-                    url = f"https://{url.strip()}"
-
-                for path in GRAPHQL_PATHS:
-                    graphql_url = f"{url.rstrip('/')}{path}"
-                    try:
-                        # Send a POST request to the GraphQL endpoint
-                        response = requests.post(graphql_url, json={"query": "{ __schema { queryType { name } } }"}, timeout=5)
-
-                        # Check the response and write results to the output file
-                        if response.status_code == 200:
-                            result = f"[FOUND] GraphQL endpoint detected at: {graphql_url}"
-                            print(f"{Fore.GREEN}{result}")
-                            outfile.write(result + '\n')
-                        elif response.status_code in [403, 405]:
-                            result = f"[POSSIBLE] Possible GraphQL endpoint at: {graphql_url} (HTTP {response.status_code})"
-                            print(f"{Fore.YELLOW}{result}")
-                            outfile.write(result + '\n')
-                        else:
-                            result = f"[FAILED] No GraphQL endpoint at: {graphql_url} (HTTP {response.status_code})"
-                            print(f"{Fore.RED}{result}")
-                    except requests.exceptions.RequestException as e:
-                        result = f"[ERROR] Could not connect to: {graphql_url} - {e}"
-                        print(f"{Fore.RED}{result}")
-                        outfile.write(result + '\n')
-
+        for url in urls:
+            scan_url(url, output_file)
     except FileNotFoundError:
         print(f"{Fore.RED}[ERROR] Input file '{input_file}' not found.")
     except Exception as e:
@@ -61,8 +69,20 @@ def detect_graphql(input_file, output_file):
 # Entry point of the script
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GraphQL Endpoint Detection Tool")
-    parser.add_argument("-l", "--list", required=True, help="Input file containing URLs (one per line)")
-    parser.add_argument("-o", "--output", required=True, help="Output file to save results")
-
+    parser.add_argument("-l", "--list", help="Input file containing URLs (one per line)")
+    parser.add_argument("-u", "--url", help="Single URL to scan")
+    parser.add_argument("-o", "--output", help="Output file to save results")
+    
     args = parser.parse_args()
-    detect_graphql(args.list, args.output)
+
+    if args.url and args.list:
+        print(f"{Fore.RED}[ERROR] You cannot specify both a single URL and a list of URLs. Choose one.")
+    elif args.url:
+        scan_url(args.url, args.output)
+    elif args.list:
+        if not args.output:
+            print(f"{Fore.RED}[ERROR] You must specify an output file when scanning a list of URLs.")
+        else:
+            detect_graphql(args.list, args.output)
+    else:
+        print(f"{Fore.RED}[ERROR] You must specify either a single URL (-u) or a list of URLs (-l).")
