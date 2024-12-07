@@ -45,7 +45,8 @@ Run the script with the following commands:
 ```bash
 python3 tool.py --url https://example.com -o <output_file>
 python3 tool.py -u https://example.com -o <output_file>
-python3 tool.sh -l <input_file> -o <output_file>
+python3 tool.py -l <input_file> -o <output_file>
+python3 tool.py --list <input_file> -o <output_file>
 ```
 
 ### Parameters:
@@ -55,7 +56,7 @@ python3 tool.sh -l <input_file> -o <output_file>
 
 ### Example:
 ```bash
-python3 tool.sh -l sites.txt -o output.txt
+python3 tool.py -l sites.txt -o output.txt
 ```
 
 ---
