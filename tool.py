@@ -85,4 +85,4 @@ if __name__ == "__main__":
         else:
             detect_graphql(args.list, args.output)
     else:
-        print(f"{Fore.RED}[ERROR]use (-h) for help, You must specify either a single URL (-u) or a list of URLs (-l).")
+        print(f"{Fore.RED}[ERROR] use (-h) for help, You must specify either a single URL (-u) or a list of URLs (-l).")
